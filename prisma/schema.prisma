@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id_category   Int      @id @default(autoincrement()) @unique
+  name          String
+  articles      Article[]
+  categories    CategoryArticle[]  // Противоположное отношение к модели CategoryArticle
+}
+
+model Article {
+  id_article    Int      @id @default(autoincrement()) @unique
+  title         String
+  content       String
+  id_category   Int?
+  author_id     Int?
+  category      Category? @relation(fields: [id_category], references: [id_category])
+  categories    CategoryArticle[]
+}
+
+model User {
+  user_id       Int      @id @default(autoincrement()) @unique
+  username      String
+  email         String
+  password      String
+  session       Session?
+}
+
+model Session {
+  session_id    String   @id
+  user_id       Int?     @unique
+  user          User?    @relation(fields: [user_id], references: [user_id])
+}
+
+model CategoryArticle {
+  id            Int      @id @default(autoincrement())
+  category      Category @relation(fields: [id_category], references: [id_category])
+  article       Article  @relation(fields: [id_article], references: [id_article])
+  id_category   Int
+  id_article    Int
+}
+
